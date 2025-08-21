@@ -26,7 +26,8 @@ class Game
 
   def play_game
     loop do
-      add_symbol(current_player)
+      return false unless can_add_symbol?(current_player)
+
       switch_players!
     end
   end
@@ -58,15 +59,17 @@ class Game
     puts
   end
 
-  def add_symbol(player)
+  def can_add_symbol?(player)
     position = player.play_symbol!
     puts "#{player}#{@current_player_id + 1} selected #{player.symbol} for position (#{position.join(',')})"
     @board_matrix[position[0] - 1][position[1] - 1] = player.symbol
     display_board
-    check_for_winner(player.symbol)
+    return false if game_won?(player) || game_tied?
+
+    true
   end
 
-  def won?(symbol)
+  def player_won?(symbol)
     WINNING_CONDITIONS.each do |condition|
       won = true
       condition.each do |index|
@@ -77,22 +80,24 @@ class Game
     false
   end
 
-  def check_for_winner(symbol)
-    if won?(symbol)
-      declare_winner(symbol)
-    elsif @board_matrix.flatten.none?(' ')
-      puts 'The game is tied!'
-      board_reset
+  def game_won?(player)
+    if player_won?(player.symbol)
+      declare_winner(player)
+      return true
     end
-    display_board
+    false
   end
 
-  def declare_winner(symbol)
-    puts "Player #{symbol} won!"
-    puts
-    return board_reset if print 'Play another game? ' == 'y'
+  def game_tied?
+    if @board_matrix.flatten.none?(' ')
+      puts 'The game is tied!'
+      return true
+    end
+    false
+  end
 
-    exit
+  def declare_winner(player)
+    puts "#{player}#{@current_player_id + 1} won!"
   end
 
   def allowed_position?(row, col)
@@ -101,9 +106,5 @@ class Game
 
   def invalid_position(row, col)
     puts "There is already an #{@board_matrix[row - 1][col - 1]} at position #{row}, #{col}"
-  end
-
-  def board_reset
-    initialize
   end
 end
