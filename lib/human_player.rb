@@ -15,6 +15,6 @@ class HumanPlayer < Player
   end
 
   def to_s
-    'Player'
+    'Humanoid'
   end
 end

@@ -19,14 +19,13 @@ class Game
     @board_matrix = Array.new(3) { Array.new(3, ' ') }
     @current_player_id = 0
     @players = [player1.new(self, 'X'), player2.new(self, 'O')]
-    display_board
     puts
-    puts "Player#{@current_player_id + 1} plays first"
+    display_board
   end
 
   def play_game
     loop do
-      return false unless can_add_symbol?(current_player)
+      return false unless can_add_symbol?
 
       switch_players!
     end
@@ -59,12 +58,15 @@ class Game
     puts
   end
 
-  def can_add_symbol?(player)
-    position = player.play_symbol!
-    puts "#{player}#{@current_player_id + 1} selected #{player.symbol} for position (#{position.join(',')})"
-    @board_matrix[position[0] - 1][position[1] - 1] = player.symbol
+  def can_add_symbol?
+    puts "#{current_player}#{@current_player_id + 1} is your turn"
+    position = current_player.play_symbol!
+    puts
+    puts "#{current_player}#{@current_player_id + 1} selected #{current_player.symbol} for position (#{position.join(',')})"
+    puts
+    @board_matrix[position[0] - 1][position[1] - 1] = current_player.symbol
     display_board
-    return false if game_won?(player) || game_tied?
+    return false if game_won? || game_tied?
 
     true
   end
@@ -80,9 +82,9 @@ class Game
     false
   end
 
-  def game_won?(player)
-    if player_won?(player.symbol)
-      declare_winner(player)
+  def game_won?
+    if player_won?(current_player.symbol)
+      declare_winner
       return true
     end
     false
@@ -96,8 +98,8 @@ class Game
     false
   end
 
-  def declare_winner(player)
-    puts "#{player}#{@current_player_id + 1} won!"
+  def declare_winner
+    puts "#{current_player}#{@current_player_id + 1} won!"
   end
 
   def allowed_position?(row, col)
